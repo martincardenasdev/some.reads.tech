@@ -8,7 +8,7 @@ public static class SearchBooks
 {
     public static void AddSearchBooksEndpoints(this IEndpointRouteBuilder app)
     {
-        app.MapGet("books/search", Handler);
+        app.MapGet("books/search", Handler).RequireAuthorization();
     }
 
     private static async Task<IResult> Handler(

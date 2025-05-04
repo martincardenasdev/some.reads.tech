@@ -8,7 +8,7 @@ namespace some.reads.tech.Features.Authors
     {
         public static void AddSearchAuthorsEndpoints(this IEndpointRouteBuilder app)
         {
-            app.MapGet("authors/search", Handler);
+            app.MapGet("authors/search", Handler).RequireAuthorization();
         }
 
         private static async Task<IResult> Handler(
