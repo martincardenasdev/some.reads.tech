@@ -2,6 +2,7 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Npgsql;
 using some.reads.tech.Helpers;
 
 namespace some.reads.tech.Features.Users
@@ -23,9 +24,7 @@ namespace some.reads.tech.Features.Users
             var validationResult = await validator.ValidateAsync(request);
 
             if (validationResult.IsValid is false)
-            {
                 return Results.BadRequest(validationResult.Errors);
-            }
 
             var hashedPassword = new PasswordHasher<User>().HashPassword(User, request.Password);
 
@@ -39,14 +38,24 @@ namespace some.reads.tech.Features.Users
                   VALUES (@Username, @PasswordHash) 
                   RETURNING id;";
 
-            var createdUser = await connection.ExecuteScalarAsync<Guid>(sql, new { User.Username, User.PasswordHash });
-
-            return Results.Ok(new
+            try
             {
-                message = "User created successfully",
-                userId = createdUser,
-            });
+                var createdUser = await connection.ExecuteScalarAsync<Guid>(sql, new { User.Username, User.PasswordHash });
 
+                return Results.Ok(new
+                {
+                    message = "User created successfully",
+                    userId = createdUser,
+                });
+            }
+            catch (Exception ex)
+            {
+                return ex switch
+                {
+                    PostgresException { SqlState: "23505" } => Results.Conflict(new { message = "Username already exists" }),
+                    _ => Results.BadRequest(new { message = "An error occurred while creating the user" })
+                };
+            }
         }
     }
 }
