@@ -1,18 +1,23 @@
 using FluentValidation;
+using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using some.reads.tech.Features.Authors;
 using some.reads.tech.Features.Books;
 using some.reads.tech.Features.Users;
 using some.reads.tech.Helpers;
 using some.reads.tech.Services;
+using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new() { Title = "some.reads.tech API", Version = "v1" });
+    c.TagActionsBy(api => [api.RelativePath.Split('/')[0].ToUpper()]);
+});
 
 builder.Services.AddSingleton(serviceProvider =>
 {
@@ -46,6 +51,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
+TypeAdapterConfig.GlobalSettings.Scan(Assembly.GetExecutingAssembly());
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -60,6 +67,7 @@ app.AddSearchBooksEndpoints();
 app.AddSearchAuthorsEndpoints();
 app.AddCreateUserEndpoints();
 app.AddLoginUserEndpoints();
+app.AddGetBookEndpoints();
 
 app.UseAuthentication();
 app.UseAuthorization();

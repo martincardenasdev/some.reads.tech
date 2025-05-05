@@ -3,7 +3,12 @@
     public record BookDto(
         string Title,
         string[] AuthorNames,
-        string CoverPic,
-        int PublishYear
+        int? PublishYear = null,
+        string[]? Subjects = null,
+        string[]? SubjectPlaces = null,
+        string[]? SubjectPeople = null,
+        string[]? SubjectTimes = null,
+        string? Description = null,
+        string[]? CoverPics = null
         );
 }

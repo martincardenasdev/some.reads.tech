@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using some.reads.tech.Common;
 using some.reads.tech.Services;
 
 namespace some.reads.tech.Features.Authors
@@ -22,7 +23,7 @@ namespace some.reads.tech.Features.Authors
             var response = await memoryCache.GetOrCreateAsync(cacheKey, async entry =>
             {
                 entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
-                return await openLibraryService.SearchAuthors(name);
+                return await openLibraryService.GetFromJsonAsync<OpenLibraryResponse<AuthorResponse>?>($"search/authors.json?q={name}");
             });
 
             if (response is null || response.NumFound == 0) return Results.NotFound(new { message = "No authors found" });

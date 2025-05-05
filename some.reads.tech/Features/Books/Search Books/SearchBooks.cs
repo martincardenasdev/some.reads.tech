@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
+using some.reads.tech.Common;
 using some.reads.tech.Services;
 
 namespace some.reads.tech.Features.Books;
@@ -22,7 +23,7 @@ public static class SearchBooks
         var response = await memoryCache.GetOrCreateAsync(cacheKey, async entry =>
         {
             entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
-            return await openLibraryService.SearchBooks(name);
+            return await openLibraryService.GetFromJsonAsync<OpenLibraryResponse<BookSearchResponse>?>($"search.json?q={name}");
         });
 
         if (response is null || response.NumFound == 0) return Results.NotFound(new { message = "No books found" });
@@ -32,8 +33,8 @@ public static class SearchBooks
             (
                 Title: doc.Title,
                 AuthorNames: doc.AuthorName,
-                CoverPic: GetCoverUrl(doc.CoverEditionKey, "L"),
-                PublishYear: doc.FirstPublishYear
+                PublishYear: doc.FirstPublishYear,
+                CoverPics: [GetCoverUrl(doc.CoverEditionKey, "L")]
             )).ToArray();
 
         return Results.Ok(new { Count = response.NumFound, books });

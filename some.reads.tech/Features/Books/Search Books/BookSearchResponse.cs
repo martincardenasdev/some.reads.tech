@@ -2,7 +2,7 @@
 
 namespace some.reads.tech.Features.Books
 {
-    public record BookResponse(
+    public record BookSearchResponse(
         string Title,
         [property: JsonPropertyName("author_name")] string[] AuthorName,
         [property: JsonPropertyName("cover_edition_key")] string CoverEditionKey,
