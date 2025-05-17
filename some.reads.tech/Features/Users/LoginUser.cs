@@ -1,11 +1,7 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.IdentityModel.Tokens;
 using some.reads.tech.Helpers;
-using System.Security.Claims;
-using System.Text;
 
 namespace some.reads.tech.Features.Users
 {
