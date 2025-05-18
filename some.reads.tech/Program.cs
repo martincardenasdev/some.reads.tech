@@ -2,6 +2,7 @@ using FluentValidation;
 using Mapster;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using some.reads.tech.Database;
 using some.reads.tech.Features.Authors;
 using some.reads.tech.Features.Books;
 using some.reads.tech.Features.Users;
@@ -29,6 +30,7 @@ builder.Services.AddSingleton(serviceProvider =>
 });
 
 builder.Services.AddSingleton<TokenProvider>();
+builder.Services.AddSingleton<DatabaseInitializer>();
 
 builder.Services.AddHttpClient<OpenLibraryService>(client =>
 {
@@ -71,5 +73,11 @@ app.AddGetBookEndpoints();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+if (args.Contains("--migrate"))
+{
+    var databaseInitializer = app.Services.GetRequiredService<DatabaseInitializer>();
+    await databaseInitializer.Initialize();
+}
 
 app.Run();

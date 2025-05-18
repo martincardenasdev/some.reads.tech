@@ -18,7 +18,8 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
-      "launchUrl": "swagger"
+      "launchUrl": "swagger",
+      "commandLineArgs": "--migrate"
     }
   }
 }
