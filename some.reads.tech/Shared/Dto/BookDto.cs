@@ -1,8 +1,10 @@
-﻿namespace some.reads.tech.Features.Books
+﻿namespace some.reads.tech.Shared.Dto
 {
     public record BookDto(
         string Title,
         string[] AuthorNames,
+        string Query,
+        string? Key = null,
         int? PublishYear = null,
         string[]? Subjects = null,
         string[]? SubjectPlaces = null,

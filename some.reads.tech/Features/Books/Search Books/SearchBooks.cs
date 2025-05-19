@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Caching.Memory;
 using some.reads.tech.Common;
 using some.reads.tech.Services;
+using some.reads.tech.Shared.Dto;
 
 namespace some.reads.tech.Features.Books;
 
@@ -33,6 +34,8 @@ public static class SearchBooks
             (
                 Title: doc.Title,
                 AuthorNames: doc.AuthorName,
+                Query: name,
+                Key: doc.Key,
                 PublishYear: doc.FirstPublishYear,
                 CoverPics: [GetCoverUrl(doc.CoverEditionKey, "L")]
             )).ToArray();

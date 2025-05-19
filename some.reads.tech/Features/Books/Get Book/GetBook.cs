@@ -1,10 +1,10 @@
 ﻿using Mapster;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
-using some.reads.tech.Features.Books.Get_Book;
 using some.reads.tech.Services;
+using some.reads.tech.Shared.Dto;
 
-namespace some.reads.tech.Features.Books
+namespace some.reads.tech.Features.Books.Get_Book
 {
     public static class GetBook
     {

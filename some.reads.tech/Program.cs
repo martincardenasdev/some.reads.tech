@@ -5,6 +5,8 @@ using Microsoft.IdentityModel.Tokens;
 using some.reads.tech.Database;
 using some.reads.tech.Features.Authors;
 using some.reads.tech.Features.Books;
+using some.reads.tech.Features.Books.Get_Book;
+using some.reads.tech.Features.Bookshelves.Add_to_bookshelf;
 using some.reads.tech.Features.Users;
 using some.reads.tech.Helpers;
 using some.reads.tech.Services;
@@ -70,6 +72,7 @@ app.AddSearchAuthorsEndpoints();
 app.AddCreateUserEndpoints();
 app.AddLoginUserEndpoints();
 app.AddGetBookEndpoints();
+app.AddAddToBookshelfEndpoints();
 
 app.UseAuthentication();
 app.UseAuthorization();
