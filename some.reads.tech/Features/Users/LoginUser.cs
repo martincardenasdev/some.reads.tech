@@ -1,11 +1,7 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.JsonWebTokens;
-using Microsoft.IdentityModel.Tokens;
 using some.reads.tech.Helpers;
-using System.Security.Claims;
-using System.Text;
 
 namespace some.reads.tech.Features.Users
 {
@@ -24,7 +20,7 @@ namespace some.reads.tech.Features.Users
         {
             await using var connection = connectionFactory.Create();
 
-            const string sql = @"SELECT id AS Id, password_hash AS PasswordHash FROM users WHERE username = @Username;";
+            const string sql = @"SELECT id AS Id, username, password_hash AS PasswordHash FROM users WHERE username = @Username;";
 
             var user = await connection.QuerySingleOrDefaultAsync<User>(sql, new { request.Username });
 

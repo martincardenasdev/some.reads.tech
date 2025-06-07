@@ -2,8 +2,8 @@
 using FluentValidation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Npgsql;
 using some.reads.tech.Helpers;
+using some.reads.tech.Shared;
 
 namespace some.reads.tech.Features.Users
 {
@@ -50,11 +50,7 @@ namespace some.reads.tech.Features.Users
             }
             catch (Exception ex)
             {
-                return ex switch
-                {
-                    PostgresException { SqlState: "23505" } => Results.Conflict(new { message = "Username already exists" }),
-                    _ => Results.BadRequest(new { message = "An error occurred while creating the user" })
-                };
+                return PostgresExceptionHandler.Handle(ex);
             }
         }
     }
