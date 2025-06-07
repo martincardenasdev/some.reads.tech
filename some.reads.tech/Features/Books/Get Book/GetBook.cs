@@ -1,6 +1,6 @@
 ﻿using Mapster;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Caching.Memory;
+using some.reads.tech.Filters;
 using some.reads.tech.Services;
 using some.reads.tech.Shared.Dto;
 
@@ -10,27 +10,17 @@ namespace some.reads.tech.Features.Books.Get_Book
     {
         public static void AddGetBookEndpoints(this IEndpointRouteBuilder app)
         {
-            app.MapGet("books/{*key}", Handler);
+            app.MapGet("books/{*key}", Handler).AddEndpointFilter<CacheEndpointFilter>();
         }
 
         private static async Task<IResult> Handler(
             [FromRoute] string key,
-            [FromServices] OpenLibraryService openLibraryService,
-            [FromServices] IMemoryCache memoryCache
+            [FromServices] OpenLibraryService openLibraryService
             )
-        {
-            string cacheKey = $"books_{key}";
+        { 
+            var response = await openLibraryService.GetFromJsonAsync<BookResponse?>($"{key}.json");
 
-            var response = await memoryCache.GetOrCreateAsync(cacheKey, async entry =>
-            {
-                entry.SetAbsoluteExpiration(TimeSpan.FromMinutes(5));
-
-                return await openLibraryService.GetFromJsonAsync<BookResponse?>($"{key}.json");
-            });
-
-            if (response is null) return Results.NotFound(new { message = "Book not found" });
-
-            return Results.Ok(response.Adapt<BookDto>());
+            return response is null ? Results.NotFound(new { message = "Book not found" }) : Results.Ok(response.Adapt<BookDto>());
         }
 
         public static string[] GetCoverUrls(int[] coverIds, string size)
