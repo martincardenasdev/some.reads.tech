@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using some.reads.tech.Common;
+﻿using some.reads.tech.Common;
 using some.reads.tech.Filters;
 using some.reads.tech.Services;
 using some.reads.tech.Shared.Dto;
@@ -13,10 +12,7 @@ public static class SearchBooks
         app.MapGet("books/search", Handler).AddEndpointFilter<CacheEndpointFilter>();
     }
 
-    private static async Task<IResult> Handler(
-        [FromQuery] string name,
-        [FromServices] OpenLibraryService openLibraryService
-        )
+    private static async Task<IResult> Handler(string name, OpenLibraryService openLibraryService)
     {
         var response = await openLibraryService.GetFromJsonAsync<OpenLibraryResponse<BookSearchResponse>?>($"search.json?q={name}");
 
