@@ -24,12 +24,12 @@ public static class SearchBooks
                 Title: doc.Title,
                 AuthorNames: doc.AuthorName,
                 Query: name,
-                Key: doc.Key,
+                Key: doc.CoverEditionKey,
                 PublishYear: doc.FirstPublishYear,
                 CoverPics: [GetCoverUrl(doc.CoverEditionKey, "L")]
             )).ToArray();
 
-        return Results.Ok(new { Count = response.NumFound, books });
+        return Results.Ok(new { response.NumFound, Docs = books });
     }
 
     private static string GetCoverUrl(string coverId, string size) => $"https://covers.openlibrary.org/b/olid/{coverId}-{size}.jpg";
