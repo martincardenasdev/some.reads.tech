@@ -12,6 +12,8 @@ using some.reads.tech.Helpers;
 using some.reads.tech.Services;
 using System.Reflection;
 using System.Text;
+using System.Text.Json;
+using Microsoft.AspNetCore.Http.Json;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,8 +41,6 @@ builder.Services.AddHttpClient<OpenLibraryService>(client =>
     client.BaseAddress = new Uri("https://openlibrary.org/");
 });
 
-builder.Services.AddMemoryCache();
-
 builder.Services.AddSingleton<IConnectionMultiplexer>(serviceProvider =>
 {
     var configuration = serviceProvider.GetService<IConfiguration>();
@@ -59,6 +59,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
         ValidAudience = builder.Configuration["Jwt:Audience"],
         ClockSkew = TimeSpan.Zero,
     };
+});
+
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
 });
 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);

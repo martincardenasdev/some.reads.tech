@@ -1,9 +1,11 @@
 ﻿using System.Text.Json;
+using Microsoft.AspNetCore.Http.Json;
+using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
 namespace some.reads.tech.Filters
 {
-    public class CacheEndpointFilter(IConnectionMultiplexer redis, ILogger<CacheEndpointFilter> logger) : IEndpointFilter
+    public class CacheEndpointFilter(IConnectionMultiplexer redis, ILogger<CacheEndpointFilter> logger, IOptions<JsonOptions> jsonOptions) : IEndpointFilter
     {
         public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
         {
@@ -26,7 +28,7 @@ namespace some.reads.tech.Filters
                 logger.LogInformation("Data cache MISS for key: {CacheKey}. Adding result to cache", cacheKey);
                 var value = valueResult.Value;
                 if (value != null)
-                    await redisDb.StringSetAsync(cacheKey, JsonSerializer.Serialize(value));
+                    await redisDb.StringSetAsync(cacheKey, JsonSerializer.Serialize(value, jsonOptions.Value.SerializerOptions));
             }
             
             return result;
