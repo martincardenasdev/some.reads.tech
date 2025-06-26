@@ -26,6 +26,7 @@ namespace some.reads.tech.Database
                 """
                 INSERT INTO users (username, password_hash)
                 VALUES ('admin', @PasswordHash)
+                ON CONFLICT (username) DO NOTHING
                 RETURNING id;
                 """,
                 new { PasswordHash = hashedPassword });
@@ -51,6 +52,7 @@ namespace some.reads.tech.Database
                 """
                 INSERT INTO bookshelves (book_id, user_id, status, title, author_names, cover_pics)
                 VALUES (@BookId, @UserId, @Status, @Title, @AuthorNames, @CoverPics)
+                ON CONFLICT (book_id) DO NOTHING
                 """,
                 new
                 {
