@@ -7,7 +7,6 @@ namespace some.reads.tech.Filters
     {
         public async ValueTask<object?> InvokeAsync(EndpointFilterInvocationContext context, EndpointFilterDelegate next)
         {
-            logger.LogInformation("Redis instance hash: {Hash}", redis.GetHashCode());
             var redisDb = redis.GetDatabase();
             
             var httpContext = context.HttpContext;
