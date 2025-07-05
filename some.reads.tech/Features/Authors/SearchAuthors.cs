@@ -1,4 +1,5 @@
-﻿using some.reads.tech.Common;
+﻿using Mapster;
+using some.reads.tech.Common;
 using some.reads.tech.Filters;
 using some.reads.tech.Services;
 
@@ -17,18 +18,9 @@ namespace some.reads.tech.Features.Authors
             
             if (response is null || response.NumFound == 0) return Results.NotFound(new { message = "No authors found" });
 
-            var authors = response.Docs
-                .Select(doc => new AuthorDto(
-                    Name: doc.Name,
-                    Picture: GetAuthorPictureUrl(doc.Key, "L"),
-                    TopSubjects: doc.TopSubjects,
-                    TopWork: doc.TopWork,
-                    BirthDate: doc.BirthDate
-                )).ToArray();
-
-            return Results.Ok(new { Count = response.NumFound, authors });
+            return Results.Ok(new { Count = response.NumFound, Authors = response.Docs.Adapt<AuthorDto[]>() });
         }
 
-        private static string GetAuthorPictureUrl(string authorId, string size) => $"https://covers.openlibrary.org/a/olid/{authorId}-{size}.jpg";
+        public static string GetAuthorPictureUrl(string authorId, string size) => $"https://covers.openlibrary.org/a/olid/{authorId}-{size}.jpg";
     }
 }

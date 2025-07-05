@@ -1,4 +1,5 @@
-﻿using some.reads.tech.Common;
+﻿using Mapster;
+using some.reads.tech.Common;
 using some.reads.tech.Filters;
 using some.reads.tech.Services;
 using some.reads.tech.Shared.Dto;
@@ -18,19 +19,8 @@ public static class SearchBooks
 
         if (response is null || response.NumFound == 0) return Results.NotFound(new { message = "No books found" });
 
-        var books = response.Docs
-            .Select(doc => new BookDto
-            (
-                Title: doc.Title,
-                AuthorNames: doc.AuthorName,
-                Query: name,
-                Key: doc.CoverEditionKey,
-                PublishYear: doc.FirstPublishYear,
-                CoverPics: [GetCoverUrl(doc.CoverEditionKey, "L")]
-            )).ToArray();
-
-        return Results.Ok(new { response.NumFound, Docs = books });
+        return Results.Ok(new { response.NumFound, response.Query, Docs = response.Docs.Adapt<BookDto[]>() });
     }
 
-    private static string GetCoverUrl(string coverId, string size) => $"https://covers.openlibrary.org/b/olid/{coverId}-{size}.jpg";
+    public static string GetCoverUrl(string coverId, string size) => $"https://covers.openlibrary.org/b/olid/{coverId}-{size}.jpg";
 }

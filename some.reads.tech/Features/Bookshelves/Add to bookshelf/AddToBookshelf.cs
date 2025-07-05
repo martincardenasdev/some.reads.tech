@@ -21,6 +21,7 @@ namespace some.reads.tech.Features.Bookshelves.Add_to_bookshelf
         private static async Task<IResult> Handler(
             [FromBody] BookDto book,
             [FromQuery] string status,
+            [FromQuery] string query,
             NpgsqlConnectionFactory connectionFactory,
             ClaimsPrincipal claims,
             IConnectionMultiplexer connectionMultiplexer,
@@ -29,7 +30,7 @@ namespace some.reads.tech.Features.Bookshelves.Add_to_bookshelf
         {
             var redisDb = connectionMultiplexer.GetDatabase();
             
-            if (!BookExists(redisDb, jsonOptions, book.Query, book.Key))
+            if (!BookExists(redisDb, jsonOptions, query, book.Key))
                 return Results.BadRequest(new { message = "Book seems to be invalid. Is this a mistake?" });
             
             var userIdString = claims.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value
@@ -45,7 +46,7 @@ namespace some.reads.tech.Features.Bookshelves.Add_to_bookshelf
 
             try
             {
-                var rowsAffected = await connection.ExecuteAsync(sql, new { BookId = book.Key, UserId = userId, Status = status, book.Title, book.AuthorNames, book.CoverPics });
+                var rowsAffected = await connection.ExecuteAsync(sql, new { BookId = book.Key, UserId = userId, Status = status, book.Title, book.AuthorName, book.CoverPics });
                 return rowsAffected > 0 ? Results.Ok(new { message = "Book added to bookshelf" }) : Results.BadRequest(new { message = "Failed to add book to bookshelf" });
             }
             catch (Exception ex)
