@@ -14,6 +14,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using Microsoft.AspNetCore.Http.Json;
+using some.reads.tech.Features.AI;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -39,6 +40,12 @@ builder.Services.AddSingleton<DatabaseInitializer>();
 builder.Services.AddHttpClient<OpenLibraryService>(client =>
 {
     client.BaseAddress = new Uri("https://openlibrary.org/");
+});
+
+builder.Services.AddHttpClient<GeminiService>(client =>
+{
+    client.BaseAddress = new Uri("https://generativelanguage.googleapis.com/");
+    client.DefaultRequestHeaders.Add("X-goog-api-key", builder.Configuration["GeminiApiKey"]);
 });
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(serviceProvider =>
@@ -86,6 +93,7 @@ app.AddCreateUserEndpoints();
 app.AddLoginUserEndpoints();
 app.AddGetBookEndpoints();
 app.AddAddToBookshelfEndpoints();
+app.AddBookSummaryEndpoints();
 
 app.UseAuthentication();
 app.UseAuthorization();
