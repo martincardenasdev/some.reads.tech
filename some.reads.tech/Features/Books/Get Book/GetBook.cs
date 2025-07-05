@@ -14,7 +14,7 @@ namespace some.reads.tech.Features.Books.Get_Book
 
         private static async Task<IResult> Handler(string key, OpenLibraryService openLibraryService)
         { 
-            var response = await openLibraryService.GetFromJsonAsync<BookResponse?>($"{key}.json");
+            var response = await openLibraryService.GetFromJsonAsync<BookResponse?>($"books/{key}.json");
 
             return response is null ? Results.NotFound(new { message = "Book not found" }) : Results.Ok(response.Adapt<BookDto>());
         }

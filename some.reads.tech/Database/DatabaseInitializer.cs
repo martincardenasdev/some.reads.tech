@@ -1,10 +1,13 @@
 ﻿using Dapper;
+using Microsoft.AspNetCore.Identity;
+using some.reads.tech.Features.Users;
 using some.reads.tech.Helpers;
 
 namespace some.reads.tech.Database
 {
     public sealed class DatabaseInitializer(NpgsqlConnectionFactory connectionFactory)
     {
+        private static readonly User User = new();
         public async Task Initialize()
         {
             await using var connection = connectionFactory.Create();
@@ -17,8 +20,20 @@ namespace some.reads.tech.Database
                 )
                 """);
 
-            // book_id here refers to the open library key 
-            await connection.ExecuteAsync("""
+            var hashedPassword = new PasswordHasher<User>().HashPassword(User, "password");
+
+            var userId = await connection.ExecuteScalarAsync<Guid>(
+                """
+                INSERT INTO users (username, password_hash)
+                VALUES ('admin', @PasswordHash)
+                ON CONFLICT (username) DO NOTHING
+                RETURNING id;
+                """,
+                new { PasswordHash = hashedPassword });
+
+            // book_id here refers to the open library key
+            await connection.ExecuteAsync(
+                """
                 CREATE TABLE IF NOT EXISTS bookshelves (
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                 book_id VARCHAR(50) NOT NULL UNIQUE,
@@ -32,6 +47,22 @@ namespace some.reads.tech.Database
                 UNIQUE(user_id, book_id)
                 ) 
                 """);
+
+            await connection.ExecuteAsync(
+                """
+                INSERT INTO bookshelves (book_id, user_id, status, title, author_names, cover_pics)
+                VALUES (@BookId, @UserId, @Status, @Title, @AuthorNames, @CoverPics)
+                ON CONFLICT (book_id) DO NOTHING
+                """,
+                new
+                {
+                    BookId = "OL22856696M",
+                    UserId = userId,
+                    Status = "reading",
+                    Title = "Harry Potter and the Philosopher's Stone",
+                    AuthorNames = (string[]) ["J. K. Rowling"],
+                    CoverPics = (string[]) ["https://covers.openlibrary.org/b/olid/OL22856696M-L.jpg"]
+                });
         }
     }
 }
